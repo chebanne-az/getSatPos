@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc2 {
+	color: #008000;
+}
+.sc3 {
+	color: #008080;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc6 {
+	color: #808080;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc16 {
+	color: #8000FF;
+}
+.sc17 {
+	font-weight: bold;
+	color: #008080;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3"> Retrieves the position of a satellite.
+ *
+ * This function makes an API request to obtain the position of a satellite at a given time.
+ *
+ * </span><span class="sc17">@note</span><span class="sc3"> The Used API is N2YO
+ *
+ * </span><span class="sc17">@param</span><span class="sc3"> noradId The NORAD ID of the satellite.
+ * </span><span class="sc17">@param</span><span class="sc3"> observerLat The latitude of the observer's location.
+ * </span><span class="sc17">@param</span><span class="sc3"> observerLng The longitude of the observer's location.
+ * </span><span class="sc17">@param</span><span class="sc3"> observerAlt The altitude of the observer's location.
+ * </span><span class="sc17">@param</span><span class="sc3"> seconds The time duration for which to retrieve the satellite's position.
+ * </span><span class="sc17">@param</span><span class="sc3"> apiKey The API key for authentication.
+ * </span><span class="sc17">@param</span><span class="sc3"> positions An array to store the satellite positions.
+ * </span><span class="sc17">@return</span><span class="sc3"> True if the request is successful, false otherwise.
+ */</span><span class="sc0">
+</span><span class="sc16">bool</span><span class="sc0"> </span><span class="sc11">getSatellitePosition</span><span class="sc10">(</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">noradId</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">observerLat</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">observerLng</span><span class="sc10">,</span><span class="sc0">
+                          </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">observerAlt</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">seconds</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">const</span><span class="sc0"> </span><span class="sc11">QString</span><span class="sc10">&amp;</span><span class="sc0"> </span><span class="sc11">apiKey</span><span class="sc10">,</span><span class="sc0">
+                          </span><span class="sc11">satPos</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">MAX_REQUEST</span><span class="sc10">])</span><span class="sc0">
+</span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// URL of the API
+</span><span class="sc0">    </span><span class="sc11">QString</span><span class="sc0"> </span><span class="sc11">url</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">QString</span><span class="sc10">(</span><span class="sc6">"https://api.n2yo.com/rest/v1/satellite/positions/%1/%2/%3/%4/%5&amp;apiKey=%6"</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">noradId</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">observerLat</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">observerLng</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">observerAlt</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">seconds</span><span class="sc10">)</span><span class="sc0">
+                      </span><span class="sc10">.</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">apiKey</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// Create a network manager
+</span><span class="sc0">    </span><span class="sc11">QNetworkAccessManager</span><span class="sc0"> </span><span class="sc11">manager</span><span class="sc10">;</span><span class="sc0">
+
+    </span><span class="sc2">// Make the API request
+</span><span class="sc0">    </span><span class="sc11">QNetworkRequest</span><span class="sc0"> </span><span class="sc11">request</span><span class="sc10">(</span><span class="sc11">url</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc11">QNetworkReply</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc11">reply</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">manager</span><span class="sc10">.</span><span class="sc11">get</span><span class="sc10">(</span><span class="sc11">request</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// Wait for the reply to finish
+</span><span class="sc0">    </span><span class="sc11">QEventLoop</span><span class="sc0"> </span><span class="sc11">loop</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc11">QObject</span><span class="sc10">::</span><span class="sc11">connect</span><span class="sc10">(</span><span class="sc11">reply</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">QNetworkReply</span><span class="sc10">::</span><span class="sc11">finished</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">loop</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">QEventLoop</span><span class="sc10">::</span><span class="sc11">quit</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc11">loop</span><span class="sc10">.</span><span class="sc11">exec</span><span class="sc10">();</span><span class="sc0">
+
+    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">reply</span><span class="sc10">-&gt;</span><span class="sc11">error</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">QNetworkReply</span><span class="sc10">::</span><span class="sc11">NoError</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc2">// Read the data from the reply
+</span><span class="sc0">        </span><span class="sc11">QByteArray</span><span class="sc0"> </span><span class="sc11">responseData</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">reply</span><span class="sc10">-&gt;</span><span class="sc11">readAll</span><span class="sc10">();</span><span class="sc0">
+        </span><span class="sc2">// Parse JSON response
+</span><span class="sc0">        </span><span class="sc11">QJsonDocument</span><span class="sc0"> </span><span class="sc11">jsonResponse</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">QJsonDocument</span><span class="sc10">::</span><span class="sc11">fromJson</span><span class="sc10">(</span><span class="sc11">responseData</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">QJsonObject</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">jsonResponse</span><span class="sc10">.</span><span class="sc11">object</span><span class="sc10">();</span><span class="sc0">
+        </span><span class="sc2">// Save Positions
+</span><span class="sc0">        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">MAX_REQUEST</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc10">++){</span><span class="sc0">
+            </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">].</span><span class="sc11">azimuth</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc10">[</span><span class="sc6">"positions"</span><span class="sc10">][</span><span class="sc11">i</span><span class="sc10">][</span><span class="sc6">"azimuth"</span><span class="sc10">].</span><span class="sc11">toDouble</span><span class="sc10">();</span><span class="sc0">
+            </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">].</span><span class="sc11">elevation</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc10">[</span><span class="sc6">"positions"</span><span class="sc10">][</span><span class="sc11">i</span><span class="sc10">][</span><span class="sc6">"elevation"</span><span class="sc10">].</span><span class="sc11">toDouble</span><span class="sc10">();</span><span class="sc0">
+            </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">].</span><span class="sc11">sataltitude</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc10">[</span><span class="sc6">"positions"</span><span class="sc10">][</span><span class="sc11">i</span><span class="sc10">][</span><span class="sc6">"sataltitude"</span><span class="sc10">].</span><span class="sc11">toDouble</span><span class="sc10">();</span><span class="sc0">
+            </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">].</span><span class="sc11">satlatitude</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc10">[</span><span class="sc6">"positions"</span><span class="sc10">][</span><span class="sc11">i</span><span class="sc10">][</span><span class="sc6">"satlatitude"</span><span class="sc10">].</span><span class="sc11">toDouble</span><span class="sc10">();</span><span class="sc0">
+            </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">].</span><span class="sc11">satlongitude</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">response</span><span class="sc10">[</span><span class="sc6">"positions"</span><span class="sc10">][</span><span class="sc11">i</span><span class="sc10">][</span><span class="sc6">"satlongitude"</span><span class="sc10">].</span><span class="sc11">toDouble</span><span class="sc10">();</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc2">// Handle the error
+</span><span class="sc0">        </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Error:"</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc11">reply</span><span class="sc10">-&gt;</span><span class="sc11">errorString</span><span class="sc10">();</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc2">// Return an empty object in case of an error
+</span><span class="sc0">    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span></div></body>
+</html>
