@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc2 {
+	color: #008000;
+}
+.sc3 {
+	color: #008080;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc6 {
+	color: #808080;
+}
+.sc7 {
+	color: #808080;
+}
+.sc9 {
+	color: #804000;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc16 {
+	color: #8000FF;
+}
+.sc17 {
+	font-weight: bold;
+	color: #008080;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc9">#include "uart.h"
+#include &lt;QCoreApplication&gt;
+#include &lt;QProcess&gt;
+#include &lt;QDebug&gt;
+#include &lt;QString&gt;
+#include &lt;QNetworkAccessManager&gt;
+#include &lt;QNetworkRequest&gt;
+#include &lt;QNetworkReply&gt;
+#include &lt;QJsonDocument&gt;
+#include &lt;QJsonObject&gt;
+#include &lt;QJsonArray&gt;
+#include &lt;QMap&gt;
+#include &lt;QtSerialPort/QSerialPort&gt;
+#include &lt;QTextStream&gt;
+#include &lt;QThread&gt;
+#include &lt;QTimer&gt;
+#include &lt;QMessageBox&gt;
+</span><span class="sc0">
+
+</span><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3"> Formats a double value as a string.
+ *
+ * This function converts a double value to a string in this specified format:
+ *
+ * The double value d will be formatted so it has always the length 6. Also respectivly
+ * 3 digits before and after the comma. This is done by adding leading zeros before and
+ * after the comma.
+ *
+ * Examples :  73.12  ---&gt; "073.120"
+ *             123.2  ---&gt; "123.200"
+ *
+ * </span><span class="sc17">@param</span><span class="sc3"> d The double value to be formatted.
+ * </span><span class="sc17">@return</span><span class="sc3"> The formatted string representation of the double value.
+ */</span><span class="sc0">
+</span><span class="sc11">QString</span><span class="sc0"> </span><span class="sc11">formatDouble</span><span class="sc10">(</span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">d</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">QString</span><span class="sc10">(</span><span class="sc6">"%1"</span><span class="sc10">).</span><span class="sc11">arg</span><span class="sc10">(</span><span class="sc11">d</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">7</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc7">'f'</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">3</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc7">'0'</span><span class="sc10">);</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3"> Sends the satellite position over a specified serial port.
+ *
+ * This function sends the satellite position, consisting of azimuth (satAz) and altitude (satAlt),
+ * to the specified serial port. The position is formatted as "xxx.xxx yyy.yyy\n", where satAz and satAlt
+ * are first formatted using the formatDouble() function.
+ *
+ * </span><span class="sc17">@param</span><span class="sc3"> satAz The azimuth value for the satellite.
+ * </span><span class="sc17">@param</span><span class="sc3"> satAlt The altitude value for the satellite.
+ * </span><span class="sc17">@param</span><span class="sc3"> comPort The name of the serial port (default is "COM3").
+ * </span><span class="sc17">@param</span><span class="sc3"> baudRate The baud rate for the serial communication (default is 115200).
+ */</span><span class="sc0">
+</span><span class="sc16">bool</span><span class="sc0"> </span><span class="sc11">sendPosition</span><span class="sc10">(</span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">satAz</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">satAlt</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">const</span><span class="sc0"> </span><span class="sc11">QString</span><span class="sc10">&amp;</span><span class="sc0"> </span><span class="sc11">comPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">qint32</span><span class="sc0"> </span><span class="sc11">baudRate</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc5">try</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc2">// Open the serial port
+</span><span class="sc0">        </span><span class="sc11">QSerialPort</span><span class="sc0"> </span><span class="sc11">serial</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setPortName</span><span class="sc10">(</span><span class="sc11">comPort</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setBaudRate</span><span class="sc10">(</span><span class="sc11">baudRate</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setDataBits</span><span class="sc10">(</span><span class="sc11">QSerialPort</span><span class="sc10">::</span><span class="sc11">Data8</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setParity</span><span class="sc10">(</span><span class="sc11">QSerialPort</span><span class="sc10">::</span><span class="sc11">NoParity</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setStopBits</span><span class="sc10">(</span><span class="sc11">QSerialPort</span><span class="sc10">::</span><span class="sc11">OneStop</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">setFlowControl</span><span class="sc10">(</span><span class="sc11">QSerialPort</span><span class="sc10">::</span><span class="sc11">NoFlowControl</span><span class="sc10">);</span><span class="sc0">
+
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">open</span><span class="sc10">(</span><span class="sc11">QIODevice</span><span class="sc10">::</span><span class="sc11">ReadWrite</span><span class="sc10">))</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Serial port"</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc11">comPort</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"opened successfully."</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc2">// Send the command
+</span><span class="sc0">            </span><span class="sc11">QString</span><span class="sc0"> </span><span class="sc11">command</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">formatDouble</span><span class="sc10">(</span><span class="sc11">satAz</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc6">" "</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">formatDouble</span><span class="sc10">(</span><span class="sc11">satAlt</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc6">"\n"</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">write</span><span class="sc10">(</span><span class="sc11">command</span><span class="sc10">.</span><span class="sc11">toUtf8</span><span class="sc10">());</span><span class="sc0">
+            </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Command '"</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc11">command</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"' sent to"</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc11">comPort</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"."</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc2">// Wait for a moment to allow the STM32 to process the command
+</span><span class="sc0">            </span><span class="sc11">delay</span><span class="sc10">(</span><span class="sc4">1000</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc2">// Close the serial port
+</span><span class="sc0">            </span><span class="sc11">serial</span><span class="sc10">.</span><span class="sc11">close</span><span class="sc10">();</span><span class="sc0">
+            </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Serial port closed."</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">true</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Cannot open serial Port."</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">false</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">catch</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc11">std</span><span class="sc10">::</span><span class="sc11">exception</span><span class="sc10">&amp;</span><span class="sc0"> </span><span class="sc11">e</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">qDebug</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc6">"Error:"</span><span class="sc0"> </span><span class="sc10">&lt;&lt;</span><span class="sc0"> </span><span class="sc11">e</span><span class="sc10">.</span><span class="sc11">what</span><span class="sc10">();</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">false</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3"> Introduces a delay in milliseconds.
+ *
+ * This function pauses the execution for a specified duration.
+ *
+ * </span><span class="sc17">@param</span><span class="sc3"> timeInMs The duration of the delay in milliseconds.
+ */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">delay</span><span class="sc10">(</span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">timeInMs</span><span class="sc10">)</span><span class="sc0">
+</span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// Introduce delay
+</span><span class="sc0">    </span><span class="sc11">QEventLoop</span><span class="sc0"> </span><span class="sc11">loop</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc11">QTimer</span><span class="sc10">::</span><span class="sc11">singleShot</span><span class="sc10">(</span><span class="sc11">timeInMs</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">loop</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">QEventLoop</span><span class="sc10">::</span><span class="sc11">quit</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc11">loop</span><span class="sc10">.</span><span class="sc11">exec</span><span class="sc10">();</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+
+</span></div></body>
+</html>
