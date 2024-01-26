@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc1 {
+	color: #008000;
+}
+.sc2 {
+	color: #008000;
+}
+.sc3 {
+	color: #008080;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc6 {
+	color: #808080;
+}
+.sc9 {
+	color: #804000;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc15 {
+	color: #008080;
+}
+.sc16 {
+	color: #8000FF;
+}
+.sc17 {
+	font-weight: bold;
+	color: #008080;
+}
+.sc18 {
+	color: #008080;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc9">#include "uart.h"
+</span><span class="sc0">
+</span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">az</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">          </span><span class="sc15">///&lt;</span><span class="sc18"> azimuth</span><span class="sc15"> angle
+</span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">elv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">         </span><span class="sc15">///&lt;</span><span class="sc18"> elevation</span><span class="sc15"> angle
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">stop</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">           </span><span class="sc15">///&lt;</span><span class="sc18"> stop</span><span class="sc15"> flag to stop tracking
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">go_back</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">        </span><span class="sc15">///&lt;</span><span class="sc18"> go</span><span class="sc15"> back flag to return to initial position
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">   </span><span class="sc15">///&lt;</span><span class="sc18"> flag</span><span class="sc15"> for successful data reception
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">count</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">          </span><span class="sc15">///&lt;</span><span class="sc18"> count</span><span class="sc15"> for the interrupt calls
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">ignore</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">         </span><span class="sc15">///&lt;</span><span class="sc18"> flag</span><span class="sc15"> to ignore first interrupt call 
+</span><span class="sc16">uint8_t</span><span class="sc0"> </span><span class="sc11">az_elv</span><span class="sc10">[</span><span class="sc4">16</span><span class="sc10">];</span><span class="sc0">     </span><span class="sc15">///&lt;</span><span class="sc18"> array</span><span class="sc15"> to save recived data
+</span><span class="sc0">
+
+</span><span class="sc3">/**
+  * </span><span class="sc17">@brief</span><span class="sc3"> Receive and process position information from UART.
+  *
+  * This function is designed to receive position information from UART and process
+  * the received data. The expected message format is "azimuth_angle elevation_angle\n".
+  * The function extracts azimuth (az) and elevation (elv) angles from the received message
+  * and takes appropriate actions based on the received values.
+  *
+  * </span><span class="sc17">@param</span><span class="sc3"> huart UART handle for communication.
+  *
+  * </span><span class="sc17">@note</span><span class="sc3"> If az = elv = 999.999, it indicates a request to stop tracking,
+  *       and both X and Y motors will be stopped.
+  * </span><span class="sc17">@note</span><span class="sc3"> If az = elv = 888.888, it indicates a request to return X and Y motors
+  *       to their initial positions.
+  */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">recievePosition</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// Toggle RED LED indicating receiving of data
+</span><span class="sc0">    </span><span class="sc11">HAL_GPIO_TogglePin</span><span class="sc10">(</span><span class="sc11">GPIOB</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_14</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// Extract azimuth and elevation from the message
+</span><span class="sc0">    </span><span class="sc11">sscanf</span><span class="sc10">((</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">char</span><span class="sc10">*)</span><span class="sc11">az_elv</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc6">"%lf %lf"</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">az</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">&amp;</span><span class="sc11">elv</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// Continue to receive data asynchronously
+</span><span class="sc0">    </span><span class="sc11">HAL_UART_Receive_IT</span><span class="sc10">(&amp;</span><span class="sc11">huart3</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">az_elv</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">16</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// Data received successfully
+</span><span class="sc0">    </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+
+    </span><span class="sc2">// Check if the received angles indicate a request to stop tracking
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">az</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">999.999</span><span class="sc0"> </span><span class="sc10">&amp;&amp;</span><span class="sc0"> </span><span class="sc11">elv</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">999.999</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc2">// Toggle GPIOB Pin 7
+</span><span class="sc0">        </span><span class="sc11">HAL_GPIO_TogglePin</span><span class="sc10">(</span><span class="sc11">GPIOB</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_7</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">stop</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Stop both motors
+</span><span class="sc0">        </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Reset the received flag
+</span><span class="sc0">    </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc2">// Check if the received angles indicate a request to go back
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">az</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">888.888</span><span class="sc0"> </span><span class="sc10">&amp;&amp;</span><span class="sc0"> </span><span class="sc11">elv</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">888.888</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc2">// Toggle GPIOB Pin 7)
+</span><span class="sc0">        </span><span class="sc11">HAL_GPIO_TogglePin</span><span class="sc10">(</span><span class="sc11">GPIOB</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_7</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">go_back</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Set the goBack flag for further processing
+</span><span class="sc0">        </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Reset the received flag
+</span><span class="sc0">    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc3">/**
+  * </span><span class="sc17">@brief</span><span class="sc3"> Transmit an error signal over UART based on the GPIO_Pin.
+  *
+  * This function is designed to transmit an error signal over UART when a specific
+  * GPIO pin triggers an external interrupt. The error signal indicates that either
+  * the X motor or the Y motor has reached its limit. The error signal is sent as a
+  * single character ('0' for X motor, '1' for Y motor) to notify the receiving end
+  * about the error condition.
+  *
+  * </span><span class="sc17">@param</span><span class="sc3"> GPIO_Pin The GPIO pin that triggered the external interrupt.
+  * </span><span class="sc17">@param</span><span class="sc3"> uart UART handle for communication.
+  *
+  */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">transmitError</span><span class="sc10">(</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">uint16_t</span><span class="sc0"> </span><span class="sc11">GPIO_Pin</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+
+    </span><span class="sc1">/* Prevent unused argument(s) compilation warning */</span><span class="sc0">
+    </span><span class="sc11">UNUSED</span><span class="sc10">(</span><span class="sc11">GPIO_Pin</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc2">// Ignore first interrupt
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(!</span><span class="sc11">ignore</span><span class="sc10">){</span><span class="sc0">
+        </span><span class="sc2">// X Motor has reached limit
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">GPIO_Pin</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">xLimPin</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc2">// Set stop to true to stop rotation
+</span><span class="sc0">            </span><span class="sc11">stop</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_TogglePin</span><span class="sc10">(</span><span class="sc11">GPIOB</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_7</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">count</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">){</span><span class="sc0">
+                </span><span class="sc2">// Transmit "0" to the GUI indicating Motor X has reached limit
+</span><span class="sc0">                </span><span class="sc11">HAL_UART_Transmit</span><span class="sc10">(&amp;</span><span class="sc11">huart3</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">uint8_t</span><span class="sc10">*)</span><span class="sc6">"0"</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">HAL_MAX_DELAY</span><span class="sc10">);</span><span class="sc0">
+                </span><span class="sc2">// Increment count to make sure that the message only sent once
+</span><span class="sc0">                </span><span class="sc11">count</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc2">// Y Motor reached limit
+</span><span class="sc0">        </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">GPIO_Pin</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">yLimPin</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc2">// Set stop to true to stop rotation
+</span><span class="sc0">            </span><span class="sc11">stop</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_TogglePin</span><span class="sc10">(</span><span class="sc11">GPIOB</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_14</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">count</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">){</span><span class="sc0">
+                </span><span class="sc2">// Transmit "1" to the GUI indicating Motor Y has reached limit
+</span><span class="sc0">                </span><span class="sc11">HAL_UART_Transmit</span><span class="sc10">(&amp;</span><span class="sc11">huart3</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">uint8_t</span><span class="sc10">*)</span><span class="sc6">"1"</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">HAL_MAX_DELAY</span><span class="sc10">);</span><span class="sc0">
+                </span><span class="sc2">// Increment count to make sure that the message only sent once
+</span><span class="sc0">                </span><span class="sc11">count</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span></div></body>
+</html>
