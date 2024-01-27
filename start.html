@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc2 {
+	color: #008000;
+}
+.sc3 {
+	color: #008080;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc6 {
+	color: #808080;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc15 {
+	color: #008080;
+}
+.sc16 {
+	color: #8000FF;
+}
+.sc17 {
+	font-weight: bold;
+	color: #008080;
+}
+.sc18 {
+	color: #008080;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3"> Initiates satellite tracking and updates the UI with real-time position data.
+ *
+ * This function starts the satellite tracking loop, continuously updating the UI with real-time
+ * position data. It initializes variables for tracking, loads satellite positions, and enters a
+ * loop that updates the UI, checks for significant changes in satellite position, and controls
+ * the satellite tracking behavior by sending position differences to the STM32 board.
+ *
+ * </span><span class="sc17">@note</span><span class="sc3"> If a difference greater than or equal to 3.6 in the satellite position at any component
+ *       (azimuth or elevation) is detected, the position difference is sent to the STM32 board
+ *       to move the motors accordingly.
+ *
+ * </span><span class="sc17">@see</span><span class="sc3"> Satellite::getSatellitePosition(int noradId, double observerLat, double observerLng,
+ *                                       double observerAlt, int seconds, const QString&amp; apiKey,
+ *                                       satPos positions[MAX_REQUEST])
+ * </span><span class="sc17">@see</span><span class="sc3"> Satellite::updateLCD(int currentPosition)
+ * </span><span class="sc17">@see</span><span class="sc3"> Satellite::sendPosition(double deltaAz, double deltaElv)
+ *
+ * </span><span class="sc17">@note</span><span class="sc3"> The function will display an error dialog if loading satellite positions fails.
+ *       The tracking loop continues until the satellite control window is closed.
+ */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">Satellite</span><span class="sc10">::</span><span class="sc11">start</span><span class="sc10">(){</span><span class="sc0">
+
+    </span><span class="sc2">// Load satellite position (300 positions advance)
+</span><span class="sc0">    </span><span class="sc16">bool</span><span class="sc0"> </span><span class="sc11">gotSatPos</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">getSatellitePosition</span><span class="sc10">(</span><span class="sc11">satID</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MY_LATITUDE</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MY_LONGITUDE</span><span class="sc10">,</span><span class="sc0">
+                                          </span><span class="sc11">MY_ALTITUDE</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MAX_REQUEST</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">API_KEY</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">);</span><span class="sc0">
+
+    </span><span class="sc2">// If loading satellite positions failed, display an error dialog
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(!</span><span class="sc11">gotSatPos</span><span class="sc10">){</span><span class="sc0">
+        </span><span class="sc2">// Display Error Dialog
+</span><span class="sc0">        </span><span class="sc11">showErrorDialog</span><span class="sc10">(</span><span class="sc6">"Error API"</span><span class="sc10">,</span><span class="sc6">"Cannot Load Sattelite Positoins!"</span><span class="sc0"> </span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+
+    </span><span class="sc2">// Initialise variables
+</span><span class="sc0">    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">currAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">currElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">prevAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">prevElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">deltaAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">deltaElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">currentPosition</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">
+
+    </span><span class="sc5">while</span><span class="sc10">(</span><span class="sc5">this</span><span class="sc10">-&gt;</span><span class="sc11">isVisible</span><span class="sc10">()){</span><span class="sc0">
+        </span><span class="sc2">// Reached last loaded position
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">currentPosition</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">MAX_REQUEST</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc2">// Load Data again (new API request)
+</span><span class="sc0">            </span><span class="sc11">getSatellitePosition</span><span class="sc10">(</span><span class="sc11">satID</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MY_LATITUDE</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MY_LONGITUDE</span><span class="sc10">,</span><span class="sc0">
+                                 </span><span class="sc11">MY_ALTITUDE</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">MAX_REQUEST</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">API_KEY</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">currentPosition</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+
+        </span><span class="sc2">// Update LCD
+</span><span class="sc0">        </span><span class="sc11">updateLCD</span><span class="sc10">(</span><span class="sc11">currentPosition</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc2">// Get current azimuth and elevation
+</span><span class="sc0">        </span><span class="sc11">currAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">currentPosition</span><span class="sc10">].</span><span class="sc11">azimuth</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc11">currElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">currentPosition</span><span class="sc10">].</span><span class="sc11">elevation</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc2">// Calculate azimuth and elevation difference from the last postion
+</span><span class="sc0">        </span><span class="sc11">deltaAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">currAz</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">prevAz</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc11">deltaElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">currElv</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">prevElv</span><span class="sc10">;</span><span class="sc0">
+
+        </span><span class="sc2">// If a difference greater than or equal to 3.6 in the satellite position,
+</span><span class="sc0">        </span><span class="sc2">// send position difference over UART
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">deltaAz</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc4">3.6</span><span class="sc0"> </span><span class="sc10">||</span><span class="sc0"> </span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">deltaElv</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc4">3.6</span><span class="sc10">){</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">trackIsPressed</span><span class="sc0"> </span><span class="sc10">&amp;&amp;</span><span class="sc0"> </span><span class="sc10">!</span><span class="sc11">limitIsReached</span><span class="sc10">){</span><span class="sc0">  </span><span class="sc15">///&lt;</span><span class="sc18"> Tracking</span><span class="sc15"> and motor limit not reached yet
+</span><span class="sc0">                </span><span class="sc11">serialPort</span><span class="sc10">-&gt;</span><span class="sc11">close</span><span class="sc10">();</span><span class="sc0">
+                </span><span class="sc5">if</span><span class="sc10">(!</span><span class="sc11">sendPosition</span><span class="sc10">(</span><span class="sc11">deltaAz</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">deltaElv</span><span class="sc10">)){</span><span class="sc0">
+                    </span><span class="sc2">// When sendig fails, display an error dialog
+</span><span class="sc0">                    </span><span class="sc11">showErrorDialog</span><span class="sc10">(</span><span class="sc6">"Error STM32"</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc6">"Cannot connect to the STM32 board!\n"</span><span class="sc0">
+                                             </span><span class="sc6">"Please make sure that the board is connected to the right COM port"</span><span class="sc10">);</span><span class="sc0">
+                </span><span class="sc10">}</span><span class="sc0">
+                </span><span class="sc11">serialPort</span><span class="sc10">-&gt;</span><span class="sc11">open</span><span class="sc10">(</span><span class="sc11">QIODevice</span><span class="sc10">::</span><span class="sc11">ReadWrite</span><span class="sc10">);</span><span class="sc0">
+                </span><span class="sc11">prevAz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">currentPosition</span><span class="sc10">].</span><span class="sc11">azimuth</span><span class="sc10">;;</span><span class="sc0">
+                </span><span class="sc11">prevElv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">positions</span><span class="sc10">[</span><span class="sc11">currentPosition</span><span class="sc10">].</span><span class="sc11">elevation</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc2">// Go to next positon and delay for 1s
+</span><span class="sc0">        </span><span class="sc11">currentPosition</span><span class="sc10">++;</span><span class="sc0">
+        </span><span class="sc11">delay</span><span class="sc10">(</span><span class="sc4">1000</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span></div></body>
+</html>
