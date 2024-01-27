@@ -11,19 +11,44 @@ span {
 }
 .sc0 {
 }
+.sc1 {
+	color: #008000;
+}
+.sc2 {
+	color: #008000;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc9 {
+	color: #804000;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc16 {
+	color: #8000FF;
+}
 </style>
 </head>
 <body>
-<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc0">// Includes
-#include "rotate.h"
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc2">// Includes
+</span><span class="sc9">#include "rotate.h"
 #include &lt;stdlib.h&gt;
 #include &lt;math.h&gt;
+</span><span class="sc0">
+
+</span><span class="sc16">extern</span><span class="sc0"> </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">stop</span><span class="sc10">;</span><span class="sc0">
 
 
-extern int stop;
-
-
-/*
+</span><span class="sc1">/*
  * @brief Rotate the X motor to a specified azimuth angle.
  *
  * This function controls the rotation of the X motor to achieve a desired azimuth angle.
@@ -31,30 +56,30 @@ extern int stop;
  * otherwise, it will be in a counterclockwise direction.
  *
  * @param azimuth The desired azimuth angle in degrees.
- */
-void rotateX(const double azimuth) {
-    // Set direction based on azimuth sign
-    if (azimuth &gt; 0) {
-        HAL_GPIO_WritePin(xDirPort, xDirPin, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(xDirPort, xDirPin, GPIO_PIN_RESET);
-    }
+ */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">rotateX</span><span class="sc10">(</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">azimuth</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// Set direction based on azimuth sign
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">azimuth</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
 
-    // Calculate the number of steps required for the rotation
-    int steps = round((abs(azimuth) / 1.8) * 4);
+    </span><span class="sc2">// Calculate the number of steps required for the rotation
+</span><span class="sc0">    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">steps</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">round</span><span class="sc10">((</span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">azimuth</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">/</span><span class="sc0"> </span><span class="sc4">1.8</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc0"> </span><span class="sc4">4</span><span class="sc10">);</span><span class="sc0">
 
-    // Iterate through the steps and control the motor
-    for (int step = 0; step &lt; steps; step++) {
-        if (stop) {
-            break;  // Break out of the loop if the motor should stop
-        }
-        HAL_GPIO_WritePin(xStepPort, xStepPin, GPIO_PIN_SET);
-        HAL_Delay(1);
-        HAL_GPIO_WritePin(xStepPort, xStepPin, GPIO_PIN_RESET);
-        HAL_Delay(1);
-    }
-}
-/*
+    </span><span class="sc2">// Iterate through the steps and control the motor
+</span><span class="sc0">    </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">steps</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc10">++)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">stop</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc5">break</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Break out of the loop if the motor should stop
+</span><span class="sc0">        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc1">/*
  * @brief Rotate the Y motor to a specified elevation angle.
  *
  * This function controls the rotation of the Y motor to achieve a desired elevation angle.
@@ -62,30 +87,30 @@ void rotateX(const double azimuth) {
  * otherwise, it will be downward.
  *
  * @param elevation The desired elevation angle in degrees.
- */
-void rotateY(const double elevation) {
-    // Set direction based on elevation sign
-    if (elevation &gt; 0) {
-        HAL_GPIO_WritePin(yDirPort, yDirPin, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(yDirPort, yDirPin, GPIO_PIN_RESET);
-    }
+ */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">rotateY</span><span class="sc10">(</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">elevation</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// Set direction based on elevation sign
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">elevation</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
 
-    // Calculate the number of steps required for the rotation
-    int steps = round((abs(elevation) / 1.8) * 3.8);
+    </span><span class="sc2">// Calculate the number of steps required for the rotation
+</span><span class="sc0">    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">steps</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">round</span><span class="sc10">((</span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">elevation</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">/</span><span class="sc0"> </span><span class="sc4">1.8</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc0"> </span><span class="sc4">3.8</span><span class="sc10">);</span><span class="sc0">
 
-    // Iterate through the steps and control the motor
-    for (int step = 0; step &lt; steps; step++) {
-        if (stop) {
-            break;  // Break out of the loop if the motor should stop
-        }
-        HAL_GPIO_WritePin(yStepPort, yStepPin, GPIO_PIN_SET);
-        HAL_Delay(1);
-        HAL_GPIO_WritePin(yStepPort, yStepPin, GPIO_PIN_RESET);
-        HAL_Delay(1);
-    }
-}
-/*
+    </span><span class="sc2">// Iterate through the steps and control the motor
+</span><span class="sc0">    </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">steps</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc10">++)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">stop</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc5">break</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Break out of the loop if the motor should stop
+</span><span class="sc0">        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc1">/*
  * @brief Simultaneously rotate the X and Y motors based on azimuth and elevation angles.
  *
  * This function controls the combined rotation of the X and Y motors to achieve a desired
@@ -94,55 +119,55 @@ void rotateY(const double elevation) {
  *
  * @param azimuth The desired azimuth angle in degrees for X motor rotation.
  * @param elevation The desired elevation angle in degrees for Y motor rotation.
- */
-void rotateXY(const double azimuth, const double elevation) {
-    // Set X motor direction based on azimuth sign
-    if (azimuth &gt; 0) {
-        HAL_GPIO_WritePin(xDirPort, xDirPin, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(xDirPort, xDirPin, GPIO_PIN_RESET);
-    }
+ */</span><span class="sc0">
+</span><span class="sc16">void</span><span class="sc0"> </span><span class="sc11">rotateXY</span><span class="sc10">(</span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">azimuth</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc16">const</span><span class="sc0"> </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">elevation</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc2">// Set X motor direction based on azimuth sign
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">azimuth</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
 
-    // Set Y motor direction based on elevation sign
-    if (elevation &gt; 0) {
-        HAL_GPIO_WritePin(yDirPort, yDirPin, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(yDirPort, yDirPin, GPIO_PIN_RESET);
-    }
+    </span><span class="sc2">// Set Y motor direction based on elevation sign
+</span><span class="sc0">    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">elevation</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0"> </span><span class="sc5">else</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yDirPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yDirPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
 
-    // Calculate the number of steps required for each motor's rotation
-    int stepsX = round((abs(azimuth) / 1.8) * 4);
-    int stepsY = round((abs(elevation) / 1.8) * 3);
+    </span><span class="sc2">// Calculate the number of steps required for each motor's rotation
+</span><span class="sc0">    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">stepsX</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">round</span><span class="sc10">((</span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">azimuth</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">/</span><span class="sc0"> </span><span class="sc4">1.8</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc0"> </span><span class="sc4">4</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">stepsY</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">round</span><span class="sc10">((</span><span class="sc11">abs</span><span class="sc10">(</span><span class="sc11">elevation</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">/</span><span class="sc0"> </span><span class="sc4">1.8</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc0"> </span><span class="sc4">3</span><span class="sc10">);</span><span class="sc0">
 
-    // Determine the maximum number of steps between X and Y rotations
-    int maxSteps = fmax(stepsX, stepsY);
+    </span><span class="sc2">// Determine the maximum number of steps between X and Y rotations
+</span><span class="sc0">    </span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">maxSteps</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">fmax</span><span class="sc10">(</span><span class="sc11">stepsX</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">stepsY</span><span class="sc10">);</span><span class="sc0">
 
-    // Iterate through the maximum number of steps, controlling both motors
-    for (int step = 0; step &lt; maxSteps; step++) {
-        if (stop) {
-            break;  // Break out of the loop if the motor should stop
-        }
+    </span><span class="sc2">// Iterate through the maximum number of steps, controlling both motors
+</span><span class="sc0">    </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">maxSteps</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc11">step</span><span class="sc10">++)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">stop</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc5">break</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Break out of the loop if the motor should stop
+</span><span class="sc0">        </span><span class="sc10">}</span><span class="sc0">
 
-        // Move in the X direction if there are remaining steps in azimuth
-        if (step &lt; stepsX) {
-            HAL_GPIO_WritePin(xStepPort, xStepPin, GPIO_PIN_SET);
-            HAL_Delay(1);
-            HAL_GPIO_WritePin(xStepPort, xStepPin, GPIO_PIN_RESET);
-            HAL_Delay(1);
-        }
+        </span><span class="sc2">// Move in the X direction if there are remaining steps in azimuth
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">stepsX</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">xStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">xStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
 
-        // Move in the Y direction if there are remaining steps in elevation
-        if (step &lt; stepsY) {
-            if (stop) {
-                break;  // Break out of the loop if the motor should stop
-            }
-            HAL_GPIO_WritePin(yStepPort, yStepPin, GPIO_PIN_SET);
-            HAL_Delay(1);
-            HAL_GPIO_WritePin(yStepPort, yStepPin, GPIO_PIN_RESET);
-            HAL_Delay(1);
-        }
-    }
-}
+        </span><span class="sc2">// Move in the Y direction if there are remaining steps in elevation
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">step</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">stepsY</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">stop</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">{</span><span class="sc0">
+                </span><span class="sc5">break</span><span class="sc10">;</span><span class="sc0">  </span><span class="sc2">// Break out of the loop if the motor should stop
+</span><span class="sc0">            </span><span class="sc10">}</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_SET</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_GPIO_WritePin</span><span class="sc10">(</span><span class="sc11">yStepPort</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">yStepPin</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">GPIO_PIN_RESET</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">HAL_Delay</span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">);</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+</span><span class="sc10">}</span><span class="sc0">
 
 </span></div></body>
 </html>
