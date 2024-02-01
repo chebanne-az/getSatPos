@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<META http-equiv=Content-Type content="text/html; charset=UTF-8">
+<title>Exported from Notepad++</title>
+<style type="text/css">
+span {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc0 {
+}
+.sc1 {
+	color: #008000;
+}
+.sc2 {
+	color: #008000;
+}
+.sc3 {
+	color: #008080;
+}
+.sc4 {
+	color: #FF8000;
+}
+.sc5 {
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc10 {
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+}
+.sc16 {
+	color: #8000FF;
+}
+.sc17 {
+	font-weight: bold;
+	color: #008080;
+}
+</style>
+</head>
+<body>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc3">/**
+ * </span><span class="sc17">@brief</span><span class="sc3">  The application entry point.
+ * </span><span class="sc17">@retval</span><span class="sc3"> int
+ */</span><span class="sc0">
+</span><span class="sc16">int</span><span class="sc0"> </span><span class="sc11">main</span><span class="sc10">(</span><span class="sc16">void</span><span class="sc10">)</span><span class="sc0">
+</span><span class="sc10">{</span><span class="sc0">
+    </span><span class="sc1">/* USER CODE BEGIN 1 */</span><span class="sc0">
+
+    </span><span class="sc1">/* USER CODE END 1 */</span><span class="sc0">
+
+    </span><span class="sc1">/* MCU Configuration--------------------------------------------------------*/</span><span class="sc0">
+
+    </span><span class="sc1">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span><span class="sc0">
+    </span><span class="sc11">HAL_Init</span><span class="sc10">();</span><span class="sc0">
+
+    </span><span class="sc1">/* USER CODE BEGIN Init */</span><span class="sc0">
+
+    </span><span class="sc1">/* USER CODE END Init */</span><span class="sc0">
+
+    </span><span class="sc1">/* Configure the system clock */</span><span class="sc0">
+    </span><span class="sc11">SystemClock_Config</span><span class="sc10">();</span><span class="sc0">
+
+    </span><span class="sc1">/* USER CODE BEGIN SysInit */</span><span class="sc0">
+
+    </span><span class="sc1">/* USER CODE END SysInit */</span><span class="sc0">
+
+    </span><span class="sc1">/* Initialize all configured peripherals */</span><span class="sc0">
+    </span><span class="sc11">MX_GPIO_Init</span><span class="sc10">();</span><span class="sc0">
+    </span><span class="sc11">MX_ETH_Init</span><span class="sc10">();</span><span class="sc0">
+    </span><span class="sc11">MX_USART3_UART_Init</span><span class="sc10">();</span><span class="sc0">
+    </span><span class="sc11">MX_USB_OTG_FS_PCD_Init</span><span class="sc10">();</span><span class="sc0">
+    </span><span class="sc1">/* USER CODE BEGIN 2 */</span><span class="sc0">
+    </span><span class="sc11">HAL_UART_Receive_IT</span><span class="sc10">(&amp;</span><span class="sc11">huart3</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">az_elv</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc4">16</span><span class="sc10">);</span><span class="sc0">
+    </span><span class="sc1">/* USER CODE END 2 */</span><span class="sc0">
+
+    </span><span class="sc1">/* Infinite loop */</span><span class="sc0">
+    </span><span class="sc1">/* USER CODE BEGIN WHILE */</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">my_az</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc16">double</span><span class="sc0"> </span><span class="sc11">my_elv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+    </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc4">1</span><span class="sc10">)</span><span class="sc0">
+    </span><span class="sc10">{</span><span class="sc0">
+        </span><span class="sc1">/* USER CODE END WHILE */</span><span class="sc0">
+
+        </span><span class="sc1">/* USER CODE BEGIN 3 */</span><span class="sc0">
+
+        </span><span class="sc2">// When position is recived, go to the given angles
+</span><span class="sc0">        </span><span class="sc2">// and save the current positon
+</span><span class="sc0">        </span><span class="sc5">if</span><span class="sc10">(</span><span class="sc11">pos_recieved</span><span class="sc10">){</span><span class="sc0">
+            </span><span class="sc11">rotateXY</span><span class="sc10">(</span><span class="sc11">az</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">elv</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">ignore</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">             </span><span class="sc2">// Used to ingone the interuppr when the limit is reached
+</span><span class="sc0">            </span><span class="sc11">my_az</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">az</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">my_elv</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">elv</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc1">/* Return to strat position is asked */</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">go_back</span><span class="sc10">){</span><span class="sc0">
+            </span><span class="sc11">rotateXY</span><span class="sc10">(-</span><span class="sc11">my_az</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc11">my_elv</span><span class="sc10">);</span><span class="sc0">
+            </span><span class="sc11">pos_recieved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">my_az</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc11">my_elv</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">0.0</span><span class="sc10">;</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+        </span><span class="sc1">/* User Aborted Tracking */</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">stop</span><span class="sc10">){</span><span class="sc0">
+            </span><span class="sc11">stop</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc4">1</span><span class="sc10">;</span><span class="sc0">
+            </span><span class="sc5">break</span><span class="sc10">;</span><span class="sc0"> </span><span class="sc1">/* Optional */</span><span class="sc0">
+        </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc10">}</span><span class="sc0">
+    </span><span class="sc1">/* USER CODE END 3 */</span><span class="sc0">
+</span><span class="sc10">}</span></div></body>
+</html>
